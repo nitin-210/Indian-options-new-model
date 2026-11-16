@@ -1,0 +1,57 @@
+# India options signals - settings (example with the defaults).
+# The app reads config/settings.toml; it is created when you save in the Settings tab.
+# Copy this file to settings.toml only if you want to edit by hand. Updates never overwrite settings.toml.
+
+[risk]
+max_loss_per_trade = 2000.0
+max_loss_confirmed = false
+daily_loss_limit = 6000.0
+max_trades_per_day = 3
+max_lots = 10
+
+[strategy]
+or_start = "09:15"
+or_end = "09:30"
+last_signal_time = "14:00"
+time_exit = "15:00"
+stop_rule = "mid"
+target_r = 2.0          # with exit_mode "hold" this is only a reference level (and the don't-chase check)
+breakout_buffer = 0.2   # the 5-minute close must clear the range by 0.2 x its width (tested Nov 2026)
+trend_filter = "yesterday"  # only trade in the direction of yesterday's move; "none" = both sides
+exit_mode = "trail"     # "trail" = stop or 15:00, after +1R the stop trails 1R behind; "hold" (A); "half" (B); "target"
+half_at_r = 1.0         # version B: sell half at this many R (the journal tracks A and B either way)
+strike_mode = "atm"
+max_signal_age_min = 10
+
+[option_checks]
+nifty_min_premium = 20.0
+nifty_max_premium = 400.0
+sensex_min_premium = 50.0
+sensex_max_premium = 1500.0
+max_spread_pct = 3.0
+
+[costs]
+brokerage_per_order = 20.0
+stt_sell_pct = 0.15
+nse_txn_pct = 0.03503
+bse_txn_pct = 0.0325
+sebi_per_crore = 10.0
+stamp_buy_pct = 0.003
+gst_pct = 18.0
+slippage_ticks = 1
+slippage_pct_no_quote = 0.5
+
+[model]
+risk_free_rate_pct = 6.0
+default_iv_pct = 14.0
+
+[odds]
+mc_replays = 10000
+mc_seed = 19
+history_max_days = 1500
+
+[feed]
+stale_after_s = 5.0
+disconnected_after_s = 30.0
+chain_strikes_each_side = 10
+port = 8765

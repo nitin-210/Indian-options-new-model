@@ -1,0 +1,12 @@
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+httpx>=0.27,<1
+websockets>=13,<18
+pyotp>=2.9,<3
+numpy>=1.26,<3
+tzdata>=2024.1
+pytest>=8,<10
+# Upstox market data (optional; only used when config/secrets.toml has an [upstox] token).
+# The SDK ships the decoder for Upstox's protobuf live feed; the app does not use it for anything else.
+upstox-python-sdk>=2.17
+protobuf>=4.25

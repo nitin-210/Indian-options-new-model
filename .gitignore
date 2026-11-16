@@ -1,0 +1,27 @@
+# Never commit: your Angel One keys and your own settings
+config/secrets.toml
+config/settings.toml
+
+# Market data, journals, logs, downloaded updates (recreated on your machine)
+data/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Research outputs and packages
+*.pkl
+*.pkl.gz
+*.npz
+*.zip
+*.bundle
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Your own saved candle files (large)
+/history*/

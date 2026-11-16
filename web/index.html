@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>India Options · Signals</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="status" id="status">
+  <div class="brand">India&nbsp;Options <span class="mode" id="mode">…</span></div>
+  <div class="pill" id="mkt">…</div>
+  <div class="clock"><b id="clk-ist">--:--:--</b><span>IST</span><b id="clk-uk">--:--:--</b><span>UK</span></div>
+  <div class="pill" id="feed" title="Market data feed">…</div>
+  <div class="kv"><span>India VIX</span><b id="vix">—</b></div>
+  <div class="kv" id="tte-kv"><span>Expiry</span><b id="tte">—</b></div>
+  <div class="kv" title="Paper P&amp;L today against your daily loss limit"><span>Today</span><b id="pnl">₹0</b><small id="pnl-limit"></small></div>
+  <div class="kv"><span>Trades</span><b id="trades">0/3</b></div>
+  <div class="spacer"></div>
+  <button class="btn" id="alerts-btn" type="button">Turn on alerts</button>
+  <button class="btn icon" id="theme-btn" type="button" aria-label="Switch light or dark theme">Light</button>
+</header>
+<div class="banner" id="banner" hidden></div>
+<div class="disclaimer">Signals only · not financial advice · nothing is placed</div>
+
+<main class="layout">
+  <section class="card signal" id="signal" aria-live="polite"></section>
+
+  <div class="col col-main">
+  <section class="card chart-card">
+    <div class="chart-head">
+      <div class="tabs" id="idx-tabs" role="tablist">
+        <button type="button" data-idx="NIFTY" class="on" role="tab">NIFTY 50 <span class="px" id="px-NIFTY"></span></button>
+        <button type="button" data-idx="SENSEX" role="tab">SENSEX <span class="px" id="px-SENSEX"></span></button>
+      </div>
+      <div class="chart-ctl">
+        <div class="seg" id="chart-size" title="Chart size">
+          <button type="button" data-size="s">S</button>
+          <button type="button" data-size="m">M</button>
+          <button type="button" data-size="l">L</button>
+        </div>
+        <div class="seg" id="tf">
+          <button type="button" data-tf="1">1m</button>
+          <button type="button" data-tf="5" class="on">5m</button>
+        </div>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="chart-wrap"><div class="chart" id="chart"></div><div class="stale-tag" id="stale-tag">NOT LIVE</div></div>
+    <div class="opt-head" id="opt-head">Click a strike in the option chain to see its live premium chart.</div>
+    <div class="opt-chart" id="opt-chart"></div>
+  </section>
+
+  <section class="card tabs-card">
+    <nav class="tabbar" id="tabbar">
+      <button type="button" data-tab="odds" class="on">Odds</button>
+      <button type="button" data-tab="journal">Journal</button>
+      <button type="button" data-tab="replay">Replay</button>
+      <button type="button" data-tab="settings">Settings</button>
+      <button type="button" data-tab="log">Log</button>
+    </nav>
+    <div class="tab on" id="tab-odds"></div>
+    <div class="tab" id="tab-journal"></div>
+    <div class="tab" id="tab-replay"></div>
+    <div class="tab" id="tab-settings"></div>
+    <div class="tab" id="tab-log"></div>
+  </section>
+  </div>
+
+  <div class="col col-side">
+  <aside class="card chain-card">
+    <div class="chain-head">
+      <b>Option chain</b><span class="muted" id="chain-exp"></span>
+      <div class="seg phone-only" id="chain-side">
+        <button type="button" data-side="CE" class="on">Calls</button>
+        <button type="button" data-side="PE">Puts</button>
+      </div>
+    </div>
+    <div class="chain-scroll">
+      <table class="chain" id="chain">
+        <thead><tr>
+          <th class="ce">OI · ΔOI</th><th class="ce">IV</th><th class="ce">Call LTP</th>
+          <th class="k">Strike</th>
+          <th class="pe">Put LTP</th><th class="pe">IV</th><th class="pe">OI · ΔOI</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="chain-foot muted">Bars show open interest (OI); the small number under it is the change in OI since yesterday. IV, delta (Δ) and theta (θ) are worked out here with Black-Scholes. Hover a price for Δ, θ and bid/ask; click it for its chart.</div>
+  </aside>
+
+  <aside class="card movers-card">
+    <div class="chain-head"><b>Top movers</b><span class="muted" id="movers-note">F&amp;O stocks · live</span></div>
+    <div class="movers-grid">
+      <div><h4 class="up">Bullish ▲</h4><table class="mv"><tbody id="mv-bull"></tbody></table></div>
+      <div><h4 class="down">Bearish ▼</h4><table class="mv"><tbody id="mv-bear"></tbody></table></div>
+    </div>
+    <div class="mv-detail" id="mv-detail" hidden></div>
+    <div class="chain-foot muted">Ranked by % change from yesterday's close. The tag comes from the near-month future: <b>Long build-up</b> = price and open interest both rising (strong bullish), <b>Short covering</b> = price up, OI down; <b>Short build-up</b> = price down, OI up (strong bearish), <b>Long unwinding</b> = price down, OI down. Click a stock for its at-the-money call and put. A list of movers, not signals.</div>
+  </aside>
+  </div>
+</main>
+<footer class="foot muted">Runs only on this computer (127.0.0.1). Charts by <a href="https://www.tradingview.com/lightweight-charts/" target="_blank" rel="noopener">TradingView Lightweight Charts</a>. Most people who trade options intraday lose money. You decide and place every order yourself.</footer>
+<script src="/static/vendor/lightweight-charts.standalone.production.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

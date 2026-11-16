@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en" data-build="__BUILD__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>India Options · Dashboard</title>
+<link rel="icon" href="data:,">
+<link rel="preload" href="/static/vendor/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+<header class="rail">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h4V9H3zM10 20h4V4h-4zM17 15h4V7h-4z" fill="none" stroke="#5CE1E6" stroke-width="1.6"/><path d="M1 12h22" stroke="#F5C451" stroke-width="1.2" stroke-dasharray="2 2"/></svg>
+    India Options <small title="Dashboard build">v__BUILD__</small>
+  </div>
+  <div class="stat" title="India VIX (volatility index)">India VIX <b id="r-vix">—</b> <small id="r-vix-chg"></small></div>
+  <div class="stat" title="Share of F&amp;O stocks trading above today's open">Breadth <b id="r-breadth">—</b></div>
+  <div class="stat" title="The tested NIFTY/SENSEX signals, tracked by the app (not your paper trades)">Signals today <b id="r-pnl">₹0</b> <small id="r-trades"></small></div>
+  <button type="button" class="paper-btn" id="paper-btn" aria-expanded="false" aria-controls="paper" title="Your paper trades: account, open and past trades">
+    <span>Paper trading</span><b id="pp-eq">₹1,00,000</b><small id="pp-today"></small></button>
+  <button type="button" class="days-btn" id="days-btn" aria-expanded="false" aria-controls="days" hidden
+    title="Replay a recorded day or rebuild any past day, and practise paper trading on it">Past days</button>
+  <div class="feed" id="r-feed" data-s="connecting"><i></i><span>Connecting</span></div>
+  <div class="clocks"><b id="clk-ist">--:--:--</b><span>IST</span><b id="clk-uk">--:--</b><span>UK</span></div>
+  <div class="replay" id="replay" hidden>
+    <button type="button" id="rp-play" aria-label="Pause replay">Pause</button>
+    <select id="rp-speed" aria-label="Replay speed">
+      <option value="1">1x (real time)</option><option value="2">2x</option><option value="5">5x</option><option value="10">10x</option>
+      <option value="30">30x</option><option value="60">60x</option><option value="120">120x</option>
+      <option value="240">240x</option><option value="600">600x</option>
+    </select>
+    <button type="button" id="rp-restart">Restart</button>
+  </div>
+  <div class="spacer"></div>
+  <a class="classic" href="/classic" title="Settings, journal, odds and the option chain">Classic view</a>
+</header>
+
+<div class="restart" id="restart" hidden role="alert"></div>
+<div class="banner" id="banner" hidden>
+  <p id="banner-text"></p>
+  <button type="button" class="go" id="banner-go">Use the tested stop</button>
+  <button type="button" class="no" id="banner-no">Keep the middle stop</button>
+</div>
+
+<main class="cockpit">
+  <section class="calls" aria-label="Index calls">
+    <section class="mine" id="mine" hidden aria-labelledby="mine-title">
+      <div class="col-head"><h2 id="mine-title">My paper trades</h2><small id="mine-sub"></small></div>
+      <ol class="list" id="mine-list"></ol>
+      <button type="button" class="mine-all" id="mine-all"></button>
+    </section>
+    <section class="take" aria-labelledby="tk-title">
+      <div class="col-head"><h2 id="tk-title">Trades to take</h2><small id="tk-sub"></small></div>
+      <ol class="list" id="trades"></ol>
+      <p class="note" id="tk-note">Only these are trades: the two tested rules on NIFTY and SENSEX (opening-range breakout, Supertrend flip). Everything else on this page is for watching.</p>
+    </section>
+    <div class="col-head"><h2>Index calls</h2><small id="calls-note"></small></div>
+    <div id="calls" style="display:contents"></div>
+    <section class="breaks" aria-labelledby="bk-title">
+      <div class="col-head"><h2 id="bk-title">Breakouts now <span class="wo">untested</span></h2><small id="bk-sub"></small></div>
+      <ol class="list" id="breaks"></ol>
+      <p class="ended" id="bk-ended"></p>
+      <p class="note">Top-10 gainers that broke above their 09:15–09:30 range and top-10 losers that broke below, at most 5 at a time.
+        Each one leaves the moment its trade ends: a 5-minute close back inside the range, the stop, the 2R target, or 15:00.
+        Stocks whose option is too thin (spread and slippage over 15% of the expected gain) are left out.
+        Untested on stocks (about 0R a trade before option costs in testing): paper trade them first.</p>
+    </section>
+    <p class="disclaimer">Signals only · not financial advice · nothing is placed</p>
+  </section>
+
+  <section class="stage" aria-label="Chart and trade plan">
+    <div class="chart-head">
+      <div class="tabs" role="tablist" id="symbols" aria-label="Chart symbol"></div>
+      <div class="quote" id="quote"></div>
+      <div class="tabs tf" role="tablist" id="tfs" aria-label="Candle size">
+        <button type="button" role="tab" data-tf="1" aria-selected="false">1m</button>
+        <button type="button" role="tab" data-tf="5" aria-selected="true">5m</button>
+        <button type="button" role="tab" data-tf="15" aria-selected="false">15m</button>
+      </div>
+      <span class="jump-wrap"><button type="button" class="jump-btn" id="jump-btn" title="Jump to a day (or scroll the chart left for earlier days)"
+        aria-label="Jump to a day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"
+        fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <input type="date" class="jump-day" id="jump-day" aria-label="Day to jump to" tabindex="-1"></span>
+      <button type="button" class="rp-start" id="rp-start" title="Practise candle by candle: click this, then click the candle to start from"><span class="rp-full">Replay from…</span><span class="rp-short">Replay</span></button>
+      <button type="button" class="fs-btn" id="fs-btn" title="Full screen chart (F). Esc or click again to go back"
+        aria-label="Full screen chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="fs-ico" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="rpbar" id="rpbar" hidden role="toolbar" aria-label="Candle replay"></div>
+    <div class="frame" id="frame">
+      <div class="hud"></div>
+      <div id="chart"></div>
+      <canvas class="overlay" id="overlay"></canvas>
+      <div class="legend" id="legend"></div>
+      <div class="chart-empty" id="chart-empty" hidden></div>
+      <button type="button" class="jump-today" id="jump-today" hidden title="Back to today's chart">Back to today</button>
+      <button type="button" class="fit" id="fit" hidden title="Fit the chart to the candles again (or double-click the chart)">Auto-fit</button>
+    </div>
+    <div class="ticket" id="ticket" aria-label="Paper trade"></div>
+    <div class="sheet" id="sheet" aria-live="polite"></div>
+  </section>
+
+  <aside class="side" aria-label="Stocks">
+    <section class="sec-picks">
+      <div class="col-head"><h2>Today's picks <span class="wo">untested</span></h2><small id="picks-sub"></small></div>
+      <ol class="list" id="picks"></ol>
+      <p class="wait" id="picks-wait"></p>
+      <p class="ended" id="picks-ended"></p>
+      <p class="note">The most volatile stocks today (top 10% by first-15-minute range and gap) once they break out of that range, at most 3 at a time.
+        Each one leaves the moment its trade ends. Slightly better than other breaks in testing but still not profitable after option costs: paper trade them first.</p>
+    </section>
+    <section class="sec-movers">
+      <div class="col-head">
+        <h2>Gainers &amp; losers <span class="wo">price board</span></h2>
+        <div class="seg" role="tablist" id="mv-tabs" aria-label="Movers">
+          <button type="button" role="tab" data-k="bull" aria-selected="true">Gainers</button>
+          <button type="button" role="tab" data-k="bear" aria-selected="false">Losers</button>
+        </div>
+      </div>
+      <ol class="list" id="movers"></ol>
+      <p class="note">Biggest % moves today. A price board only, no signals. When one breaks its range with a trade, it shows up under Breakouts now (left) or Today's picks.</p>
+    </section>
+  </aside>
+</main>
+
+<aside class="paper" id="paper" hidden aria-labelledby="pp-title">
+  <div class="pp-head">
+    <h2 id="pp-title">Paper trading</h2><small id="pp-since"></small>
+    <button type="button" class="pp-close" id="pp-close" aria-label="Close paper trading">×</button>
+  </div>
+  <div class="pp-body" id="pp-body"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<aside class="paper days" id="days" hidden aria-labelledby="dy-title">
+  <div class="pp-head">
+    <h2 id="dy-title">Past days</h2><small>Replay a day and practise paper trading on it</small>
+    <button type="button" class="pp-close" id="dy-close" aria-label="Close past days">×</button>
+  </div>
+  <div class="pp-body">
+    <section class="dy-box">
+      <h3>Practise any past day</h3>
+      <p class="note">Downloads that day's 1-minute candles from your broker, then replays it at 30x. The live screen keeps running.</p>
+      <div class="dy-row">
+        <input type="date" id="dy-date" aria-label="Day to practise">
+        <label class="dy-chk"><input type="checkbox" id="dy-stocks"> with stocks (movers, picks: a few minutes)</label>
+        <button type="button" class="dy-go" id="dy-go">Rebuild &amp; practise</button>
+      </div>
+    </section>
+    <section class="dy-box" id="dy-status-box" hidden>
+      <h3>Now</h3>
+      <p id="dy-status"></p>
+      <div class="dy-row">
+        <a class="dy-go" id="dy-open" href="#" target="_blank" rel="noopener" hidden>Open practice ↗</a>
+        <button type="button" class="dy-stop" id="dy-stop">Stop</button>
+      </div>
+      <pre class="dy-log" id="dy-log" hidden></pre>
+    </section>
+    <section class="dy-box">
+      <h3>Saved days</h3>
+      <ol class="dy-list" id="dy-list"></ol>
+      <p class="note" id="dy-empty" hidden>No saved days yet. Live days are recorded automatically from 09:00 IST; rebuilt days appear here too.</p>
+    </section>
+  </div>
+</aside>
+
+<script src="/static/vendor/lightweight-charts.standalone.production.js"></script>
+<script src="/static/dashboard.js"></script>
+<script src="/static/tools.js"></script>
+</body>
+</html>

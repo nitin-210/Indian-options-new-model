@@ -1,0 +1,30 @@
+INDIA OPTIONS DASHBOARD - SETUP
+================================
+Signals and practice only. It never places orders. Not financial advice.
+
+1. Install Python 3.12 from https://www.python.org/downloads/ (Mac or Windows).
+
+2. Get your own Upstox token (read-only, free, lasts a year):
+   upstox.com/developer/apps -> "Analytics" tab -> Generate Token.
+   Never share this token with anyone.
+
+3. In the "config" folder, copy "secrets.example.toml" to "secrets.toml",
+   open it in a text editor and paste your token at the bottom:
+       [upstox]
+       access_token = "your-token-here"
+   (Without a token the app runs a demo day, so you can look around first.)
+
+4. Start it:
+   - Mac: double-click "start-demo.command" (first time: right-click > Open).
+     Or in Terminal, from this folder:   bash start-demo.command
+   - Windows (PowerShell, in this folder):
+       py -3.12 -m venv .venv
+       .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+       .\.venv\Scripts\python.exe -m app
+   The first start installs packages (a minute or two). The dashboard opens at
+   http://127.0.0.1:8765 in your browser. Keep the window open while you use it.
+
+5. Optional: history files (fast practice on any day since 2022, longer backtest).
+   Put folders named history1, history2, ... inside this folder if you were given them.
+
+Market hours: 09:15-15:30 IST. Outside them, use "Past days" to practise on earlier days.

@@ -1,0 +1,13 @@
+# NSE / BSE equity-derivatives trading holidays (weekdays only).
+# Source: NSE holiday list for 2026. Add the 2027 list when NSE publishes it (usually December).
+# Expiry dates are NOT taken from here: they come from Angel One's instrument file each morning.
+
+[holidays]
+"2026-10-20" = "Dussehra"
+"2026-11-10" = "Diwali Balipratipada"
+"2026-11-24" = "Prakash Gurpurb Sri Guru Nanak Dev"
+"2026-12-25" = "Christmas"
+
+[special_sessions]
+# One-hour symbolic sessions. The strategy ignores them (they fall on a weekend).
+"2026-11-08" = "Diwali Muhurat trading (Sunday)"
